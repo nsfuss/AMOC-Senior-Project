@@ -1,4 +1,5 @@
 import numpy as np
+rng = np.random.default_rng()
 # Basic Function Definitions
 
 def Q(deltaS, args):
@@ -7,7 +8,7 @@ def Q(deltaS, args):
     
     Parameters:
         deltaS: array, values to solve over
-        args: array of form: [beta, alpha, deltaT, H, k]
+        args: array of form: [beta, alpha, deltaT, H, k] (takes H despite not using it for ease of using in other functions)
             all elements are floats
     """
     return args[4]*(args[1]*args[2] - args[0]*deltaS)
@@ -125,18 +126,38 @@ def getH(args, n):
 
     return H
 
-def dDSnoArg(H, q, dS):
+def randQ(deltaS, args, rand, method):
     """
-    Calculate dDS/dt from H, q, and dS for calclating how dDS/dt progresses given random q and likewise with random dS
-
+    Calculate q with various stochastic methods
+    
     Parameters:
-    H: float
-    dS: float or numpy array
-    q: float or numpy array
-    ONLY ONE OF dS OR q SHOULD BE AN ARRAY, OTHER SHOULD BE FLOAT
-
-    Outputs:
-    dDS: numpy array
+        deltaS: array, values to solve over
+        args: array of form: [beta, alpha, deltaT, H, k]
+            all elements are floats
+        rand: randomly generated value
+        method: 0,1,2,3, or 4 refers to which way of randomizing q to run
+            0 is random addition to beta
+            1 is random addition to alpha
+            2 is random addition to deltaT
+            3 is random addition to k
+            4 is addative stochastic value at end
     """
 
-    return 2*H - 2*np.absolute(q)*dS
+    if method == 0: # random addition to beta
+        q = args[4]*(args[1]*args[2] - (args[0]+rand)*deltaS)
+    elif method == 1:
+        q = args[4]*((args[1]+rand)*args[2] - args[0]*deltaS)
+    elif method == 2:
+        q = args[4]*(args[1]*(args[2]+rand) - args[0]*deltaS)
+    elif method == 3:
+        q = (args[4]+rand)*(args[1]*args[2] - args[0]*deltaS)
+    else:
+        q = args[4]*(args[1]*args[2] - args[0]*deltaS) + rand
+    
+    return q
+
+def dDSnoArgs(deltaS, q, H):
+    """
+    Calculate dDS/dt from deltaS, q, and H rather than calculating q during the funciton (Needed for randomizing q)
+    """
+    return 2*H - 2*np.absolute(q)*deltaS
