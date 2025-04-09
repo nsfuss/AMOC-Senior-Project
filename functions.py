@@ -125,3 +125,18 @@ def getH(args, n):
 
     return H
 
+def dDSnoArg(H, q, dS):
+    """
+    Calculate dDS/dt from H, q, and dS for calclating how dDS/dt progresses given random q and likewise with random dS
+
+    Parameters:
+    H: float
+    dS: float or numpy array
+    q: float or numpy array
+    ONLY ONE OF dS OR q SHOULD BE AN ARRAY, OTHER SHOULD BE FLOAT
+
+    Outputs:
+    dDS: numpy array
+    """
+
+    return 2*H - 2*np.absolute(q)*dS
