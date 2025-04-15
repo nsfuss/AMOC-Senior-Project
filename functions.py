@@ -169,26 +169,27 @@ def dDSnoArgs(deltaS, q, H):
     """
     return 2*H - 2*np.absolute(q)*deltaS
 
-def q_H2(Hmax,args,start, end, n):
+def q_H2(args,start, end, n):
     '''
     A Function of q in terms of H at equilibrium points:
         |q|dS = H => |q| = H/(dS)
     
     Parameters:
-        H: numpy array lenght n containing values of H
         args: array of floats [beta, alpha, deltaT, k]
-        start: 
+        start: lowest value of H wanted
+        end: highest value of H wanted
+        n: number of H's wanted (this will be the sum of the length of q0 (or q1) and q2)
 
     Output:
-        q: numpy array size n x 3 containing values of q given H at
-        each equilibrium point
-
-    To avoid dealing with the complexities of this please input values of H such that all radicands in dS are positive
-    This can be done by finding where H*b / (k*a^2*dT^2) =< 1/4 (use the getH function below to create an array for H given the args)
+        q0: np.array containing values of q within the first equilibrium zone
+        q1: np.array containing values of q within the second equilibrium zone
+        q2: np.array containing values of q within the third equilibrium zone
     '''
+
+    Hmax = (args[3]*(args[1]**2)*(args[2]**2)) / (args[0]*4) # maximum value of H such that dS0 and dS1 are real (note that -Hmax is the minimum such that dS2 is real)
     H = np.linspace(start,end,n)
-    H1 = H[np.where(H < Hmax)]
-    H2 = H[np.where(H > -Hmax)]
+    H1 = H[np.where(H <= Hmax)]
+    H2 = H[np.where(H >= -Hmax)]
 
     dS0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - H1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
     dS1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - H1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
