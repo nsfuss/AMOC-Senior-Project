@@ -169,7 +169,7 @@ def dDSnoArgs(deltaS, q, H):
     """
     return 2*H - 2*np.absolute(q)*deltaS
 
-def q_H2(args,start, end, n):
+def q_H2(args, start, end, n):
     '''
     A Function of q in terms of H at equilibrium points:
         |q|dS = H => |q| = H/(dS)
@@ -178,25 +178,48 @@ def q_H2(args,start, end, n):
         args: array of floats [beta, alpha, deltaT, k]
         start: lowest value of H wanted
         end: highest value of H wanted
-        n: number of H's wanted (this will be the sum of the length of q0 (or q1) and q2)
+        n: number of H's wanted (this will be the sum of the length of q0 (or q1) and q2), must be even
 
     Output:
-        q0: np.array containing values of q within the first equilibrium zone
-        q1: np.array containing values of q within the second equilibrium zone
-        q2: np.array containing values of q within the third equilibrium zone
+        q0: array size 2 by i containing values of q within the first equilibrium zone: q0[0] = qi0 ; q0[1] = qd0 (note i+j=n)
+        q1: array size 2 by i containing values of q within the second equilibrium zone: q1[0] = qi1 ; q1[1] = qd1 (note i+j=n)
+        q2: array size 2 by j containing values of q within the third equilibrium zone: q2[0] = qi2 ; q2[1] = qd2 (note i+j=n)
+        time: np.array containing values 0,1,2,...,n
     '''
 
     Hmax = (args[3]*(args[1]**2)*(args[2]**2)) / (args[0]*4) # maximum value of H such that dS0 and dS1 are real (note that -Hmax is the minimum such that dS2 is real)
-    H = np.linspace(start,end,n)
-    H1 = H[np.where(H <= Hmax)]
-    H2 = H[np.where(H >= -Hmax)]
+    time = np.arange(n) # list [0,1,...,n]
 
-    dS0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - H1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
-    dS1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - H1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
-    dS2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + H2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
+    # H Increasing
+    Hi = np.linspace(start,end,(n / 2)) # H increasing
+    Hi1 = Hi[np.where(Hi <= Hmax)] # All areas where first eq and unstable eq are real
+    Hi2 = Hi[np.where(Hi >= -Hmax)] # All areas where third eq is real
+    
+    dSi0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - Hi1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
+    dSi1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - Hi1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
+    dSi2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + Hi2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
 
-    q0 = H1 / (dS0)
-    q1 = H1 / (dS1)
-    q2 = H2 / (dS2)
+    qi0 = Hi1 / (dSi0) # q in first stable equilibrium zone
+    qi1 = Hi1 / (dSi1) # q in  unstable equilibrium zone
+    qi2 = Hi2 / (dSi2) # q in second stable equilibrium zone
 
-    return q0, q1, q2
+    # H Decreasing
+
+    Hd = np.linspace(end,start,(n / 2)) # H decreasing
+    Hd1 = Hd[np.where(Hd <= Hmax)] # All areas where first eq and unstable eq are real
+    Hd2 = Hd[np.where(Hd >= -Hmax)] # All areas where third eq is real
+    
+    dSd0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - Hd1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
+    dSd1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - Hd1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
+    dSd2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + Hd2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
+
+    qd0 = Hd1 / (dSd0) # q in first stable equilibrium zone
+    qd1 = Hd1 / (dSd1) # q in  unstable equilibrium zone
+    qd2 = Hd2 / (dSd2) # q in second stable equilibrium zone
+
+    # Returning Calculated Values
+    q0 = [qi0,qd0]
+    q1 = [qi1,qd1]
+    q2 = [qi2,qd2]
+
+    return q0, q1, q2, time
