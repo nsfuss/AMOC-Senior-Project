@@ -193,7 +193,7 @@ def q_H2(args, start, end, n):
     Hmax = (args[3]*(args[1]**2)*(args[2]**2)) / (args[0]*4) # maximum value of H such that dS0 and dS1 are real (note that -Hmax is the minimum such that dS2 is real)
 
     # H Increasing
-    Hi = np.linspace(start,end,(n / 2)) # H increasing
+    Hi = np.linspace(start,end,int(n / 2)) # H increasing
     Hi1 = Hi[np.where(Hi <= Hmax)] # All areas where first eq and unstable eq are real
     Hi2 = Hi[np.where(Hi >= -Hmax)] # All areas where third eq is real
     
@@ -212,7 +212,7 @@ def q_H2(args, start, end, n):
 
     # H Decreasing
 
-    Hd = np.linspace(end,start,(n / 2)) # H decreasing
+    Hd = np.linspace(end,start,int(n / 2)) # H decreasing
     Hd1 = Hd[np.where(Hd <= Hmax)] # All areas where first eq and unstable eq are real
     Hd2 = Hd[np.where(Hd >= -Hmax)] # All areas where third eq is real
     
