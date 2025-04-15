@@ -204,7 +204,7 @@ def q_H2(args, start, end, n):
     timei1 = np.arange(len(Hi1)) # Times for dSi0 and dSi1 are just from start till the index where Hi reaches Hmax (for simplicity this can be expressed as just the length of Hi1)
 
     dSi2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + Hi2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
-    timei2 = np.arange((n/2)-len(Hi2, (n/2))) # Time for dSi2, from the index where Hi passes -Hmax until the end of Hi (in terms of math this starts at n/2 - the length of Hi2 and continues until Hi index at n/2)
+    timei2 = np.arange((n/2)-len(Hi2), (n/2)) # Time for dSi2, from the index where Hi passes -Hmax until the end of Hi (in terms of math this starts at n/2 - the length of Hi2 and continues until Hi index at n/2)
 
     qi0 = Hi1 / (dSi0) # q in first stable equilibrium zone
     qi1 = Hi1 / (dSi1) # q in  unstable equilibrium zone
@@ -217,10 +217,10 @@ def q_H2(args, start, end, n):
     Hd2 = Hd[np.where(Hd >= -Hmax)] # All areas where third eq is real
     
     dSd0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - Hd1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
-    timed0 = np.arange(n/2 + len(Hd1),n) # Times for dSd0 and dSd1 are just from the index Hd drops below Hmax till until n (from n/2 + length of Hd1 to n)
+    timed0 = np.arange(n - len(Hd1),n) # Times for dSd0 and dSd1 are just from the index Hd drops below Hmax till until n (from n/2 + length of Hd1 to n)
 
     dSd1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - Hd1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
-    timed1 = np.arange(n/2 + len(Hd1),n) # Times for dSd0 and dSd1 are just from the index Hd drops below Hmax till until n (from n/2 + length of Hd1 to n)
+    timed1 = np.arange(n - len(Hd1),n) # Times for dSd0 and dSd1 are just from the index Hd drops below Hmax till until n (from n/2 + length of Hd1 to n)
 
     dSd2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + Hd2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
     timed2 = np.arange(n/2, n/2+len(Hd2)) # Times for dSd2 is from n/2 until the index where Hd drops below -Hmax (n/2 until n/2 + length of Hd2)
