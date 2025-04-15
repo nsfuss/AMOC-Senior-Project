@@ -108,7 +108,7 @@ def q_H(H,args):
 
     return q
 
-def getH(args, n):
+def getH(args, n, start=False):
     '''
     A function to determine the maximum value of H dS be non imaginary and then 
     create an array of n equally spaced values between 0 and the maximum H.
@@ -116,13 +116,20 @@ def getH(args, n):
     Parameters:
     args: array of floats [beta, alpha, deltaT, k]
     n: length of returned H
+    start: where to start the list from, (defaults to -Hmax), if start > Hmax will return the list from Hmax to start
 
     Outputs:
     H: numpy array of n equally spaced values of H between 0 and the calculated maximum value to avoid imaginary dS values
     '''
 
     Hmax = (args[3]*(args[1]**2)*(args[2]**2)) / (args[0]*4)
-    H = np.linspace(0,Hmax,n)
+
+    if start == False:
+        H = np.linspace(-Hmax, Hmax,n)
+    elif start < Hmax:
+        H = np.linspace(start,Hmax,n)
+    elif start > Hmax:
+        H = np.linspace(Hmax,start,n)
 
     return H
 
