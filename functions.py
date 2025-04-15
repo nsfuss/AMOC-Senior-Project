@@ -176,19 +176,21 @@ def q_H2(args, start, end, n):
     
     Parameters:
         args: array of floats [beta, alpha, deltaT, k]
-        start: lowest value of H wanted
-        end: highest value of H wanted
+        start: lowest value of H wanted, note if start < end, values will be swapped
+        end: highest value of H wanted, note if start < end, values will be swapped
         n: number of H's wanted (this will be the sum of the length of q0 (or q1) and q2), must be even
 
     Output:
         q0: array size 2 by i containing values of q within the first equilibrium zone: q0[0] = qi0 ; q0[1] = qd0 (note i+j=n)
         q1: array size 2 by i containing values of q within the second equilibrium zone: q1[0] = qi1 ; q1[1] = qd1 (note i+j=n)
         q2: array size 2 by j containing values of q within the third equilibrium zone: q2[0] = qi2 ; q2[1] = qd2 (note i+j=n)
-        time: np.array containing values 0,1,2,...,n
+        time: 6 arrays
     '''
 
+    if start > end:
+        start, end = end, start
+    
     Hmax = (args[3]*(args[1]**2)*(args[2]**2)) / (args[0]*4) # maximum value of H such that dS0 and dS1 are real (note that -Hmax is the minimum such that dS2 is real)
-    time = np.arange(n) # list [0,1,...,n]
 
     # H Increasing
     Hi = np.linspace(start,end,(n / 2)) # H increasing
@@ -196,8 +198,13 @@ def q_H2(args, start, end, n):
     Hi2 = Hi[np.where(Hi >= -Hmax)] # All areas where third eq is real
     
     dSi0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - Hi1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
+    timei0 = np.arange(len(Hi1)) # Times for dSi0 and dSi1 are just from start till the index where Hi reaches Hmax (for simplicity this can be expressed as just the length of Hi1)
+
     dSi1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - Hi1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
+    timei1 = np.arange(len(Hi1)) # Times for dSi0 and dSi1 are just from start till the index where Hi reaches Hmax (for simplicity this can be expressed as just the length of Hi1)
+
     dSi2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + Hi2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
+    timei2 = np.arange((n/2)-len(Hi2, (n/2))) # Time for dSi2, from the index where Hi passes -Hmax until the end of Hi (in terms of math this starts at n/2 - the length of Hi2 and continues until Hi index at n/2)
 
     qi0 = Hi1 / (dSi0) # q in first stable equilibrium zone
     qi1 = Hi1 / (dSi1) # q in  unstable equilibrium zone
@@ -210,16 +217,23 @@ def q_H2(args, start, end, n):
     Hd2 = Hd[np.where(Hd >= -Hmax)] # All areas where third eq is real
     
     dSd0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - Hd1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
+    timed0 = np.arange(n/2 + len(Hd1),n) # Times for dSd0 and dSd1 are just from the index Hd drops below Hmax till until n (from n/2 + length of Hd1 to n)
+
     dSd1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - Hd1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
+    timed1 = np.arange(n/2 + len(Hd1),n) # Times for dSd0 and dSd1 are just from the index Hd drops below Hmax till until n (from n/2 + length of Hd1 to n)
+
     dSd2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + Hd2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
+    timed2 = np.arange(n/2, n/2+len(Hd2)) # Times for dSd2 is from n/2 until the index where Hd drops below -Hmax (n/2 until n/2 + length of Hd2)
+
 
     qd0 = Hd1 / (dSd0) # q in first stable equilibrium zone
     qd1 = Hd1 / (dSd1) # q in  unstable equilibrium zone
     qd2 = Hd2 / (dSd2) # q in second stable equilibrium zone
 
     # Returning Calculated Values
+    times = [timei0, timed0, timei1, timed1, timei2, timed2]
     q0 = [qi0,qd0]
     q1 = [qi1,qd1]
     q2 = [qi2,qd2]
 
-    return q0, q1, q2, time
+    return q0, q1, q2, times
