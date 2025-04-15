@@ -168,3 +168,34 @@ def dDSnoArgs(deltaS, q, H):
     Calculate dDS/dt from deltaS, q, and H rather than calculating q during the funciton (Needed for randomizing q)
     """
     return 2*H - 2*np.absolute(q)*deltaS
+
+def q_H2(Hmax,args,start, end, n):
+    '''
+    A Function of q in terms of H at equilibrium points:
+        |q|dS = H => |q| = H/(dS)
+    
+    Parameters:
+        H: numpy array lenght n containing values of H
+        args: array of floats [beta, alpha, deltaT, k]
+        start: 
+
+    Output:
+        q: numpy array size n x 3 containing values of q given H at
+        each equilibrium point
+
+    To avoid dealing with the complexities of this please input values of H such that all radicands in dS are positive
+    This can be done by finding where H*b / (k*a^2*dT^2) =< 1/4 (use the getH function below to create an array for H given the args)
+    '''
+    H = np.linspace(start,end,n)
+    H1 = H[np.where(H < Hmax)]
+    H2 = H[np.where(H > -Hmax)]
+
+    dS0 = args[1]*args[2] * (1/2 - np.sqrt(1/4 - H1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # First stable equilibrium zone
+    dS1 = args[1]*args[2] * (1/2 + np.sqrt(1/4 - H1*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Unstable equilibrium zone
+    dS2 = args[1]*args[2] * (1/2 + np.sqrt(1/4 + H2*args[0]/(args[3]*(args[1]**2)*(args[2]**2)))) / args[0] # Second stable equilibrium zone
+
+    q0 = H1 / (dS0)
+    q1 = H1 / (dS1)
+    q2 = H2 / (dS2)
+
+    return q0, q1, q2
