@@ -184,7 +184,8 @@ def q_H2(args, start, end, n):
         q0: array size 2 by i containing values of q within the first equilibrium zone: q0[0] = qi0 ; q0[1] = qd0 (note i+j=n)
         q1: array size 2 by i containing values of q within the second equilibrium zone: q1[0] = qi1 ; q1[1] = qd1 (note i+j=n)
         q2: array size 2 by j containing values of q within the third equilibrium zone: q2[0] = qi2 ; q2[1] = qd2 (note i+j=n)
-        time: 6 arrays
+        time: 6 arrays of times
+        H: the 4 arrays of H values used to calculate q
     '''
 
     if start > end:
@@ -231,9 +232,10 @@ def q_H2(args, start, end, n):
     qd2 = Hd2 / (dSd2) # q in second stable equilibrium zone
 
     # Returning Calculated Values
+    H = [Hi1,Hi2,Hd1,Hd2]
     times = [timei0, timed0, timei1, timed1, timei2, timed2]
     q0 = [qi0,qd0]
     q1 = [qi1,qd1]
     q2 = [qi2,qd2]
 
-    return q0, q1, q2, times
+    return q0, q1, q2, times, H
